@@ -1,10 +1,151 @@
-{% extends 'base.html' %}
+{% extends "base.html" %} {% block content %}
+<div class="min-h-screen bg-base-200 py-10">
+  <div class="mx-auto w-full max-w-6xl px-4">
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-bold">
+          <i class="bi bi-book"></i> Book Tracker
+        </h1>
+        <p class="text-base-content/70 mt-1">
+          Manage your personal reading collection.
+        </p>
+      </div>
 
-{% block content %}
-
-<div class="flex justify-center items-center">
-    <div class="bg-white p-6 rounded-lg w-full lg:w-3/4">
-        <h1 class="text-4xl">Book Tracker</h1>
+      <button
+        class="btn btn-primary gap-2"
+        onclick="add_book_modal.showModal()"
+      >
+        <i class="bi bi-journal-plus"></i> Add Book
+      </button>
     </div>
+
+    <!-- Add Book Modal -->
+    <dialog id="add_book_modal" class="modal">
+      <div class="modal-box max-w-lg">
+        <h3 class="text-2xl font-bold mb-2">
+          <i class="bi bi-book"></i> Add New Book
+        </h3>
+
+        <p class="text-sm text-base-content/70 mb-6">
+          Fill in the details below to add a new book to your collection.
+        </p>
+
+        <form method="post" class="space-y-5">
+          {% csrf_token %} {% for field in form %}
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold"> {{ field.label }} </span>
+
+              {% if field.field.required %}
+              <span class="label-text-alt text-error">*</span>
+              {% endif %}
+            </label>
+
+            {{ field }} {% if field.help_text %}
+            <label class="label">
+              <span class="label-text-alt text-base-content/60">
+                {{ field.help_text }}
+              </span>
+            </label>
+            {% endif %} {% for error in field.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error"> {{ error }} </span>
+            </label>
+            {% endfor %}
+          </div>
+          {% endfor %}
+
+          <div class="modal-action">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              onclick="add_book_modal.close()"
+            >
+              Cancel
+            </button>
+
+            <button type="submit" class="btn btn-success">Save Book</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Close when clicking outside the modal -->
+      <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+      </form>
+    </dialog>
+
+    <!-- Books Card -->
+    <div class="card bg-base-100 shadow-xl border border-base-300">
+      <div class="card-body">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="card-title text-2xl">My Books</h2>
+
+          <div class="badge badge-primary badge-lg">
+            {{ books|length }} Books
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg">
+          <table class="table table-zebra table-hover">
+            <thead>
+              <tr>
+                <th class="w-16">#</th>
+                <th>Book</th>
+                <th>Genre</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for book in books %}
+              <tr class="hover">
+                <td class="font-semibold">{{ forloop.counter }}</td>
+
+                <td>
+                  <div class="font-semibold">{{ book.name }}</div>
+                </td>
+
+                <td>
+                  <span class="badge badge-secondary badge-outline">
+                    {{ book.genre }}
+                  </span>
+                </td>
+
+                <td class="text-base-content/70">
+                  {{ book.created_at|date:"M d, Y" }}
+                </td>
+              </tr>
+
+              {% empty %}
+              <tr>
+                <td colspan="4">
+                  <div class="flex flex-col items-center justify-center py-12">
+                    <div class="text-6xl mb-3">📚</div>
+
+                    <h3 class="text-xl font-semibold">No books yet</h3>
+
+                    <p class="text-base-content/60 mt-2">
+                      Start building your reading list by adding your first
+                      book.
+                    </p>
+
+                    <button
+                      class="btn btn-primary mt-6"
+                      onclick="add_book_modal.showModal()"
+                    >
+                      Add Your First Book
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
