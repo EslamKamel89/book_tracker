@@ -1,0 +1,56 @@
+<form
+  id="book-form"
+  method="post"
+  class="space-y-5"
+  hx-post="{% url 'index' %}"
+  hx-target="#tbody"
+  hx-target-400="#book-form"
+  hx-swap="afterbegin"
+  hx-swap-400="outerHTML"
+  hx-on::after-request="
+if(event.detail.successful){
+    this.reset();
+    add_book_modal.close();
+}"
+  hx-indicator="#loading-spinner"
+>
+  {% csrf_token %} {% for field in form %}
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text font-semibold"> {{ field.label }} </span>
+
+      {% if field.field.required %}
+      <span class="label-text-alt text-error">*</span>
+      {% endif %}
+    </label>
+
+    {{ field }} {% if field.help_text %}
+    <label class="label">
+      <span class="label-text-alt text-base-content/60">
+        {{ field.help_text }}
+      </span>
+    </label>
+    {% endif %} {% for error in field.errors %}
+    <label class="label">
+      <span class="label-text-alt text-error"> {{ error }} </span>
+    </label>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+  <div class="modal-action">
+    <button
+      type="button"
+      class="btn btn-ghost"
+      onclick="add_book_modal.close()"
+    >
+      Cancel
+    </button>
+
+    <button type="submit" class="btn btn-success">Save Book</button>
+    <span
+      id="loading-spinner"
+      class="htmx-indicator loading loading-spinner"
+    ></span>
+  </div>
+</form>

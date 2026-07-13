@@ -30,44 +30,7 @@
         <p class="text-sm text-base-content/70 mb-6">
           Fill in the details below to add a new book to your collection.
         </p>
-
-        <form method="post" class="space-y-5">
-          {% csrf_token %} {% for field in form %}
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text font-semibold"> {{ field.label }} </span>
-
-              {% if field.field.required %}
-              <span class="label-text-alt text-error">*</span>
-              {% endif %}
-            </label>
-
-            {{ field }} {% if field.help_text %}
-            <label class="label">
-              <span class="label-text-alt text-base-content/60">
-                {{ field.help_text }}
-              </span>
-            </label>
-            {% endif %} {% for error in field.errors %}
-            <label class="label">
-              <span class="label-text-alt text-error"> {{ error }} </span>
-            </label>
-            {% endfor %}
-          </div>
-          {% endfor %}
-
-          <div class="modal-action">
-            <button
-              type="button"
-              class="btn btn-ghost"
-              onclick="add_book_modal.close()"
-            >
-              Cancel
-            </button>
-
-            <button type="submit" class="btn btn-success">Save Book</button>
-          </div>
-        </form>
+        {% include 'partials/form.html' %}
       </div>
 
       <!-- Close when clicking outside the modal -->
@@ -91,33 +54,16 @@
           <table class="table table-zebra table-hover">
             <thead>
               <tr>
-                <th class="w-16">#</th>
                 <th>Book</th>
                 <th>Genre</th>
                 <th>Created</th>
               </tr>
             </thead>
 
-            <tbody>
-              {% for book in books %}
-              <tr class="hover">
-                <td class="font-semibold">{{ forloop.counter }}</td>
-
-                <td>
-                  <div class="font-semibold">{{ book.name }}</div>
-                </td>
-
-                <td>
-                  <span class="badge badge-secondary badge-outline">
-                    {{ book.genre }}
-                  </span>
-                </td>
-
-                <td class="text-base-content/70">
-                  {{ book.created_at|date:"M d, Y" }}
-                </td>
-              </tr>
-
+            <tbody id="tbody">
+              <!--prettier-ignore-->
+              {% for book in books %} 
+              {% include "partials/row.html" %} 
               {% empty %}
               <tr>
                 <td colspan="4">

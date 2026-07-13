@@ -1,6 +1,7 @@
 from typing import cast
 
 from django.contrib.auth.decorators import login_required
+from django.forms import BoundField
 from django.http import HttpRequest
 from django.shortcuts import render
 
@@ -10,8 +11,24 @@ from core.models import Book, User
 
 @login_required()
 def index(request: HttpRequest):
-    user = request.user
-    books = cast(User, user).books.all()
-    form = BookForm()
-    context = {"books": books, "form": form}
-    return render(request, "index.html", context)
+    user = cast(User, request.user)
+    context = {}
+    form = BookForm(request.POST or None)
+    if request.method == "POST":
+        if not form.is_valid():
+            return render(request, "partials/form.html", {"form": form}, status=400)
+        else:
+            name = form.cleaned_data["name"]
+            genre = form.cleaned_data["genre"]
+            book, _ = Book.objects.get_or_create(name=name, genre=genre)
+            user.books.add(book)
+            return render(request, "partials/row.html", {"book": book})
+
+    books = user.books.all()
+    context.update({"books": books, "form": form})
+
+    return render(
+        request,
+        "index.html",
+        context,
+    )
