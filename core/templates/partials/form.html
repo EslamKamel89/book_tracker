@@ -1,12 +1,9 @@
 <form
   id="book-form"
-  method="post"
   class="space-y-5"
   hx-post="{% url 'index' %}"
   hx-target="#tbody"
-  hx-target-400="#book-form"
   hx-swap="afterbegin"
-  hx-swap-400="outerHTML"
   hx-on::after-request="
 if(event.detail.successful){
     this.reset();
@@ -14,7 +11,18 @@ if(event.detail.successful){
 }"
   hx-indicator="#loading-spinner"
 >
-  {% csrf_token %} {% for field in form %}
+  {% if form.non_field_errors %}
+  <div class="alert alert-error" id="non-field-errors">
+    <ul>
+      {% for error in form.non_field_errors %}
+      <li>{{error}}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  <!--prettier-ignore-->
+  {% csrf_token %} 
+  {% for field in form %}
   <div class="form-control">
     <label class="label">
       <span class="label-text font-semibold"> {{ field.label }} </span>

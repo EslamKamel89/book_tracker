@@ -12,23 +12,23 @@ from core.models import Book, User
 @login_required()
 def index(request: HttpRequest):
     user = cast(User, request.user)
-    context = {}
-    form = BookForm(request.POST or None)
+    form = BookForm(request.POST or None, user=user)
     if request.method == "POST":
         if not form.is_valid():
-            return render(request, "partials/form.html", {"form": form}, status=400)
-        else:
-            name = form.cleaned_data["name"]
-            genre = form.cleaned_data["genre"]
-            book, _ = Book.objects.get_or_create(name=name, genre=genre)
-            user.books.add(book)
-            return render(request, "partials/row.html", {"book": book})
+            response = render(request, "partials/form.html", {"form": form}, status=400)
+            response["HX-Reswap"] = "outerHTML"
+            response["HX-Retarget"] = "#book-form"
+            return response
+        name = form.cleaned_data["name"]
+        genre = form.cleaned_data["genre"]
+        book, _ = Book.objects.get_or_create(name=name, genre=genre)
+        user.books.add(book)
+        return render(request, "partials/row.html", {"book": book})
 
     books = user.books.all()
-    context.update({"books": books, "form": form})
 
     return render(
         request,
         "index.html",
-        context,
+        {"books": books, "form": form},
     )

@@ -60,7 +60,17 @@
               </tr>
             </thead>
 
-            <tbody id="tbody">
+            <tbody
+              id="tbody"
+              hx-on::after-settle="
+              console.log(this.firstChild.style.background);
+              this.firstChild.style.background = 'lightgreen';
+              setTimeout(()=>{
+                this.firstChild.style.background = '';
+              }, 2000);
+              clearForm();
+              "
+            >
               <!--prettier-ignore-->
               {% for book in books %} 
               {% include "partials/row.html" %} 
