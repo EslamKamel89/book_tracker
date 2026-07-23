@@ -2,8 +2,9 @@ from typing import cast
 
 from django.contrib.auth.decorators import login_required
 from django.forms import BoundField
-from django.http import HttpRequest
-from django.shortcuts import render
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_http_methods
 
 from core.forms import BookForm
 from core.models import Book, User
@@ -32,3 +33,14 @@ def index(request: HttpRequest):
         "index.html",
         {"books": books, "form": form},
     )
+
+
+@login_required()
+@require_http_methods(["DELETE"])
+def delete_book(request: HttpRequest, pk: int):
+    user = cast(User, request.user)
+    book = get_object_or_404(Book, pk=pk)
+    user.books.remove(book)
+    response = HttpResponse(status=204)
+    response["HX-Trigger"] = "book-deleted"
+    return response

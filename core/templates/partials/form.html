@@ -40,7 +40,7 @@ if(event.detail.successful){
     </label>
     {% endif %} {% for error in field.errors %}
     <label class="label">
-      <span class="label-text-alt text-error"> {{ error }} </span>
+      <span class="label-text-alt text-error form-error"> {{ error }} </span>
     </label>
     {% endfor %}
   </div>

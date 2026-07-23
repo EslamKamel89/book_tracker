@@ -30,9 +30,46 @@
       referrerpolicy="no-referrer"
     />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body hx-ext="response-targets">
     {% include 'navbar.html' %} {% block content %} {% endblock %}
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+      document.body.addEventListener("htmx:configRequest", (event) => {
+        event.detail.headers["X-CSRFToken"] = "{{ csrf_token }}";
+      });
+      document.body.addEventListener("htmx:confirm", function (evt) {
+        // 1. Stop the default browser confirm dialog from opening
+        evt.preventDefault();
+
+        // 2. Launch the SweetAlert2 popup
+        Swal.fire({
+          title: "Are you sure?",
+          text: evt.detail.question, // Automatically pulls text from hx-confirm
+          // icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, proceed!",
+          cancelButtonText: "Cancel",
+          // showCloseButton: true,
+          toast: true,
+          position: "center",
+          timer: 15000,
+          width: "20rem",
+          customClass: {
+            title: "!text-lg",
+            htmlContainer: "!text-base",
+            confirmButton: "!text-base",
+            denyButton: "!text-base",
+            cancelButton: "!text-base",
+          },
+        }).then(function (result) {
+          // 3. If confirmed, resume the HTMX request
+          if (result.isConfirmed) {
+            evt.detail.issueRequest(true); // Passing true skips further confirmation loops
+          }
+        });
+      });
+    </script>
   </body>
 </html>

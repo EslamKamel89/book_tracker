@@ -7,7 +7,14 @@ let clearForm = () => {
     .forEach((input) => {
       input.value = "";
     });
+  form.querySelectorAll(".form-error").forEach((el) => {
+    el.textContent = "";
+  });
   form.querySelectorAll("select").forEach((select) => {
     select.selectedIndex = 0;
   });
+};
+
+let removeEmptyState = () => {
+  document.getElementById("empty-message")?.remove();
 };

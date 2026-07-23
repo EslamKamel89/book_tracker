@@ -10,6 +10,18 @@ class BookForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user: User | None = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        self.fields["name"].help_text = (
+            "Enter a unique book title between 5 and 100 characters."
+        )
+
+    def clean_name(self):
+        name = self.cleaned_data["name"]
+        name = name.strip()
+        if len(name) < 5:
+            raise forms.ValidationError("Book name must contain at least 5 characters.")
+        if len(name) > 100:
+            raise forms.ValidationError("Book name cannot exceed 100 characters.")
+        return name
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()

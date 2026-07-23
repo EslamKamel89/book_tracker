@@ -8,4 +8,14 @@
   </td>
 
   <td class="text-base-content/70">{{ book.created_at|date:"M d, Y" }}</td>
+  <td>
+    <button
+      class="cursor-pointer"
+      hx-delete="{% url 'delete-book' book.pk %}"
+      hx-on:book-deleted="this.closest('tr').remove()"
+      hx-confirm="Are you sure you want to delete {{ book.name }}"
+    >
+      <i class="bi bi-trash3 text-red-500"></i>
+    </button>
+  </td>
 </tr>
